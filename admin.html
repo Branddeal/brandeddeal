@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel - Upload Product</title>
+  <style>
+    body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+    h2 { text-align: center; }
+    form {
+      background: #fff; padding: 20px; max-width: 400px;
+      margin: 0 auto; border-radius: 10px; box-shadow: 0 0 10px #ccc;
+    }
+    input, button {
+      width: 100%; padding: 10px; margin: 8px 0;
+      border: 1px solid #ccc; border-radius: 5px;
+    }
+    button {
+      background: #28a745; color: white; border: none;
+      font-weight: bold; cursor: pointer;
+    }
+    button:hover { background: #218838; }
+    .clear-btn { background: #dc3545; }
+  </style>
+</head>
+<body>
+  <h2>📸 Add Product</h2>
+  <form onsubmit="handleAddProduct(event)">
+    <input type="text" id="name" placeholder="Product Name" required />
+    <input type="file" id="img" accept="image/*" required />
+    <input type="number" id="mrp" placeholder="MRP" required />
+    <input type="number" id="price" placeholder="Selling Price" required />
+    <input type="number" id="qty" placeholder="Stock Quantity" required />
+    <input type="text" id="size" placeholder="Sizes (e.g. S,M,L or 30,32,34)" />
+    <button type="submit">➕ Add Product</button>
+    <button type="button" class="clear-btn" onclick="clearProducts()">🗑️ Clear All Products</button>
+  </form>
+
+  <script>
+    function handleAddProduct(e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const file = document.getElementById("img").files[0];
+      const mrp = parseFloat(document.getElementById("mrp").value);
+      const price = parseFloat(document.getElementById("price").value);
+      const qty = parseInt(document.getElementById("qty").value);
+      const size = document.getElementById("size").value;
+
+      const reader = new FileReader();
+      reader.onloadend = function () {
+        const imgData = reader.result;
+        const product = { name, img: imgData, mrp, price, qty, size };
+        const products = JSON.parse(localStorage.getItem("products") || "[]");
+        products.push(product);
+        localStorage.setItem("products", JSON.stringify(products));
+        alert("✅ Product Added!");
+        e.target.reset();
+      };
+      if (file) reader.readAsDataURL(file);
+      else alert("Please select an image.");
+    }
+
+    function clearProducts() {
+      if (confirm("Are you sure?")) {
+        localStorage.removeItem("products");
+        alert("🗑️ All products cleared.");
+      }
+    }
+  </script>
+</body>
+</html>
