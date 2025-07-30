@@ -1,130 +1,167 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin Panel - BrandedDeal</title>
+  <meta charset="UTF-8">
+  <title>BrandedDeal Admin Panel</title>
   <style>
-    body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+    body { font-family: Arial; background: #f5f5f5; padding: 20px; }
     h2 { text-align: center; }
-    form {
-      background: #fff;
+    form, .product-list {
+      background: white;
+      max-width: 600px;
+      margin: 20px auto;
       padding: 20px;
-      max-width: 400px;
-      margin: 0 auto;
-      border-radius: 10px;
+      border-radius: 8px;
       box-shadow: 0 0 10px #ccc;
     }
     input, button {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
+      padding: 8px;
+      margin: 6px 0;
       border-radius: 5px;
+      border: 1px solid #ccc;
     }
-    button {
-      background: #28a745;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    button { background: #28a745; color: white; font-weight: bold; cursor: pointer; }
     .danger { background: #dc3545; }
+    .product {
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+    .product input { width: 48%; margin: 2px 1%; display: inline-block; }
+    .product button { margin-top: 6px; }
   </style>
 </head>
 <body>
-  <h2>🛠️ BrandedDeal Admin Panel</h2>
-  <form onsubmit="saveProduct(event)">
-    <input type="text" id="name" placeholder="Product Name" required />
-    <input type="url" id="img" placeholder="Image URL (e.g. https://...)" required />
-    <input type="number" id="mrp" placeholder="MRP" required />
-    <input type="number" id="price" placeholder="Selling Price" required />
-    <input type="number" id="qty" placeholder="Stock Quantity" required />
-    <input type="text" id="size" placeholder="Size (e.g. S,M,L or 30,32,34)" required />
-    <input type="password" id="token" placeholder="GitHub Token" required />
+  <h2>📦 BrandedDeal Admin Panel - Add & Edit Products</h2>
+
+  <form onsubmit="addProduct(event)">
+    <input id="name" placeholder="Product Name" required />
+    <input id="img" placeholder="Image URL" required />
+    <input id="mrp" placeholder="MRP" type="number" required />
+    <input id="price" placeholder="Selling Price" type="number" required />
+    <input id="qty" placeholder="Stock Quantity" type="number" required />
+    <input id="size" placeholder="Sizes (e.g. S,M,L or 30,32,...)" required />
+    <input id="token" placeholder="GitHub Token" required type="password" />
     <button type="submit">➕ Add Product</button>
-    <button type="button" class="danger" onclick="clearAll()">🗑️ Clear All Products</button>
+    <button type="button" class="danger" onclick="clearAll()">🗑️ Clear All</button>
   </form>
+
+  <div class="product-list" id="productList">
+    <h3>📝 Edit Products</h3>
+    <div id="products"></div>
+  </div>
 
   <script>
     const owner = "Branddeal";
     const repo = "brandeddeal";
     const filePath = "products.json";
 
-    async function fetchProducts(token) {
+    let githubToken = "";
+
+    async function fetchData() {
       const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: "Bearer " + githubToken }
       });
       return await res.json();
     }
 
-    async function saveProduct(e) {
-      e.preventDefault();
-      const name = nameEl.value;
-      const img = imgEl.value;
-      const mrp = +mrpEl.value;
-      const price = +priceEl.value;
-      const qty = +qtyEl.value;
-      const size = sizeEl.value;
-      const token = tokenEl.value;
+    async function loadProducts() {
+      const data = await fetchData();
+      const json = JSON.parse(atob(data.content));
+      const container = document.getElementById("products");
+      container.innerHTML = "";
+      json.forEach((prod, i) => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <input value="${prod.name}" id="name_${i}" />
+          <input value="${prod.img}" id="img_${i}" />
+          <input value="${prod.mrp}" id="mrp_${i}" type="number" />
+          <input value="${prod.price}" id="price_${i}" type="number" />
+          <input value="${prod.qty}" id="qty_${i}" type="number" />
+          <input value="${prod.size}" id="size_${i}" />
+          <button onclick="updateProduct(${i})">💾 Update</button>
+          <button class="danger" onclick="deleteProduct(${i})">❌ Delete</button>
+        `;
+        container.appendChild(div);
+      });
+    }
 
-      const product = { name, img, mrp, price, qty, size };
-      const data = await fetchProducts(token);
-
-      const decoded = atob(data.content);
-      const json = JSON.parse(decoded);
-      json.push(product);
-
-      const updatedContent = btoa(JSON.stringify(json, null, 2));
-
+    async function updateOnGitHub(updatedList, msg) {
+      const data = await fetchData();
       await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: "Bearer " + githubToken,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          message: "Add product via admin.html",
-          content: updatedContent,
+          message: msg,
+          content: btoa(JSON.stringify(updatedList, null, 2)),
           sha: data.sha
         })
       });
+    }
 
-      alert("✅ Product list updated!");
-      e.target.reset();
+    async function updateProduct(index) {
+      const data = await fetchData();
+      const json = JSON.parse(atob(data.content));
+      json[index] = {
+        name: document.getElementById("name_" + index).value,
+        img: document.getElementById("img_" + index).value,
+        mrp: +document.getElementById("mrp_" + index).value,
+        price: +document.getElementById("price_" + index).value,
+        qty: +document.getElementById("qty_" + index).value,
+        size: document.getElementById("size_" + index).value
+      };
+      await updateOnGitHub(json, "Updated product: " + json[index].name);
+      alert("✅ Product updated!");
+      loadProducts();
+    }
+
+    async function deleteProduct(index) {
+      if (!confirm("Delete this product?")) return;
+      const data = await fetchData();
+      const json = JSON.parse(atob(data.content));
+      json.splice(index, 1);
+      await updateOnGitHub(json, "Deleted a product");
+      alert("❌ Product deleted.");
+      loadProducts();
     }
 
     async function clearAll() {
-      if (!confirm("Are you sure to clear all products?")) return;
-      const token = prompt("Enter GitHub token again:");
-      if (!token) return;
-
-      const data = await fetchProducts(token);
-      const updatedContent = btoa(JSON.stringify([], null, 2));
-
-      await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: "Clear all products",
-          content: updatedContent,
-          sha: data.sha
-        })
-      });
-
-      alert("🧹 Product list cleared!");
+      if (!confirm("Clear all products?")) return;
+      const data = await fetchData();
+      await updateOnGitHub([], "Cleared all products");
+      alert("🧹 All products cleared.");
+      loadProducts();
     }
 
-    const nameEl = document.getElementById("name");
-    const imgEl = document.getElementById("img");
-    const mrpEl = document.getElementById("mrp");
-    const priceEl = document.getElementById("price");
-    const qtyEl = document.getElementById("qty");
-    const sizeEl = document.getElementById("size");
-    const tokenEl = document.getElementById("token");
+    async function addProduct(e) {
+      e.preventDefault();
+      githubToken = document.getElementById("token").value;
+      const product = {
+        name: document.getElementById("name").value,
+        img: document.getElementById("img").value,
+        mrp: +document.getElementById("mrp").value,
+        price: +document.getElementById("price").value,
+        qty: +document.getElementById("qty").value,
+        size: document.getElementById("size").value
+      };
+      const data = await fetchData();
+      const json = JSON.parse(atob(data.content));
+      json.push(product);
+      await updateOnGitHub(json, "Added new product: " + product.name);
+      alert("✅ Product added!");
+      e.target.reset();
+      loadProducts();
+    }
+
+    document.getElementById("token").addEventListener("change", () => {
+      githubToken = document.getElementById("token").value;
+      loadProducts();
+    });
   </script>
 </body>
 </html>
