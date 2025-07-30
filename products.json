@@ -22,5 +22,13 @@
     "price": 1099,
     "qty": 2,
     "size": "S - 1  M - 1"
+  },
+  {
+    "name": "AYUSH A JAIN",
+    "img": "https://i.postimg.cc/Cxwzb3sx/Screenshot-2025-07-30-at-3-27-14-PM.png",
+    "mrp": 1,
+    "price": 1,
+    "qty": 1,
+    "size": "32"
   }
 ]
