@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "name": "adidas",
+    "img": "https://postimg.cc/dZV1L0ht",
+    "mrp": 2499,
+    "price": 199,
+    "qty": 10,
+    "size": "S - 3 M -3 L -3 XL -1 "
+  }
+]
