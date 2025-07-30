@@ -1,18 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>BrandedDeal - Product Catalog</title>
+  <meta charset="UTF-8">
+  <title>BrandedDeal - Products</title>
   <style>
     body {
-      font-family: Arial;
-      background: #f9f9f9;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
       margin: 0;
       padding: 20px;
     }
     h2 {
       text-align: center;
+      color: #333;
     }
     .products {
       display: flex;
@@ -22,11 +22,11 @@
       margin-top: 30px;
     }
     .product-card {
-      background: #fff;
+      background: white;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      width: 220px;
       padding: 15px;
+      width: 220px;
       text-align: center;
     }
     .product-card img {
@@ -36,6 +36,7 @@
       border-radius: 8px;
     }
     .price {
+      font-size: 16px;
       margin-top: 10px;
     }
     .mrp {
@@ -51,47 +52,63 @@
       margin-top: 4px;
     }
     .whatsapp-btn {
-      background: #25D366;
-      color: #fff;
-      padding: 8px 10px;
-      text-decoration: none;
-      border-radius: 6px;
-      display: inline-block;
       margin-top: 10px;
+      display: inline-block;
+      background: #25D366;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h2>🛍️ BrandedDeal Product Catalog</h2>
+  <h2>🛍️ Welcome to BrandedDeal</h2>
   <div class="products" id="productList">Loading products...</div>
 
   <script>
+    const username = "Branddeal";
+    const repo = "brandeddeal";
+    const file = "products.json";
+
     async function loadProducts() {
-      const res = await fetch("https://raw.githubusercontent.com/Branddeal/brandeddeal/main/products.json");
-      const products = await res.json();
+      const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${file}`);
+      const data = await res.json();
+      const products = JSON.parse(atob(data.content));
+
       const container = document.getElementById("productList");
       container.innerHTML = "";
 
       products.forEach(prod => {
         if (prod.qty === 0) return;
-        const discount = Math.round(((prod.mrp - prod.price) / prod.mrp) * 100);
-        const whatsappMsg = encodeURIComponent(
-          `Hi, I'm interested in this product:\n${prod.name}\nPrice: ₹${prod.price}\nMRP: ₹${prod.mrp}\nSize: ${prod.size}\nStock: ${prod.qty}`
-        );
 
-        const card = document.createElement("div");
-        card.className = "product-card";
-        card.innerHTML = `
-          <img src="${prod.img}" alt="product">
+        const discount = Math.round(((prod.mrp - prod.price) / prod.mrp) * 100);
+
+        const div = document.createElement("div");
+        div.className = "product-card";
+        const whatsappMsg = encodeURIComponent(`Hi, I'm interested in this product:
+${prod.name}
+Price: ₹${prod.price}
+MRP: ₹${prod.mrp}
+Size: ${prod.size}`);
+        div.innerHTML = `
+          <img src="${prod.img}" alt="${prod.name}">
           <h4>${prod.name}</h4>
-          <div class="price"><span class="mrp">₹${prod.mrp}</span> → <b>₹${prod.price}</b></div>
-          <div class="discount">${discount}% OFF</div>
+          <p class="price">
+            <span class="mrp">₹${prod.mrp}</span> → <strong>₹${prod.price}</strong><br>
+            <span class="discount">${discount}% OFF</span>
+          </p>
           <div class="stock">Stock: ${prod.qty}</div>
           <div class="size">Size: ${prod.size}</div>
-          <a class="whatsapp-btn" target="_blank" href="https://wa.me/917090798777?text=${whatsappMsg}">📲 Enquire</a>
+          <a class="whatsapp-btn" href="https://wa.me/917090798777?text=${whatsappMsg}" target="_blank">📲 Enquire</a>
         `;
-        container.appendChild(card);
+        container.appendChild(div);
       });
+
+      if (products.length === 0) {
+        container.innerHTML = "No products available.";
+      }
     }
 
     loadProducts();
