@@ -1,70 +1,96 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🛍️ Product Catalog</title>
+  <title>BrandedDeal - Product Catalog</title>
   <style>
-    body { font-family: Arial; background: #f5f5f5; padding: 20px; }
-    h2 { text-align: center; }
-    .products { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+    body {
+      font-family: Arial;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    .products {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
     .product-card {
-      background: #fff; padding: 15px; border-radius: 10px;
-      width: 200px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 220px;
+      padding: 15px;
+      text-align: center;
     }
     .product-card img {
-      width: 100%; height: 180px; object-fit: cover; border-radius: 8px; cursor: pointer;
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
     }
-    .price { margin: 10px 0; }
-    .mrp { text-decoration: line-through; color: #888; }
-    .discount { color: green; font-weight: bold; }
-    .size, .stock { font-size: 14px; margin-top: 5px; }
+    .price {
+      margin-top: 10px;
+    }
+    .mrp {
+      text-decoration: line-through;
+      color: #888;
+    }
+    .discount {
+      color: green;
+      font-weight: bold;
+    }
+    .stock, .size {
+      font-size: 14px;
+      margin-top: 4px;
+    }
     .whatsapp-btn {
-      display: inline-block; background: #25D366; color: #fff;
-      padding: 6px 10px; margin-top: 10px; border-radius: 6px; text-decoration: none;
+      background: #25D366;
+      color: #fff;
+      padding: 8px 10px;
+      text-decoration: none;
+      border-radius: 6px;
+      display: inline-block;
+      margin-top: 10px;
     }
-    #previewModal {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center;
-    }
-    #previewModal img { max-width: 90%; max-height: 80%; border-radius: 10px; box-shadow: 0 0 20px #fff; }
   </style>
 </head>
 <body>
-  <h2>🛍️ Product Catalog</h2>
-  <div class="products" id="productList"></div>
-
-  <div id="previewModal" onclick="this.style.display='none'">
-    <img id="previewImage" src="" />
-  </div>
+  <h2>🛍️ BrandedDeal Product Catalog</h2>
+  <div class="products" id="productList">Loading products...</div>
 
   <script>
-    function showPreview(src) {
-      document.getElementById("previewImage").src = src;
-      document.getElementById("previewModal").style.display = "flex";
-    }
+    async function loadProducts() {
+      const res = await fetch("https://raw.githubusercontent.com/Branddeal/brandeddeal/main/products.json");
+      const products = await res.json();
+      const container = document.getElementById("productList");
+      container.innerHTML = "";
 
-    function loadProducts() {
-      const products = JSON.parse(localStorage.getItem("products") || "[]");
-      const list = document.getElementById("productList");
-      list.innerHTML = "";
-      products.forEach(p => {
-        if (p.qty === 0) return;
-        const discount = Math.round(((p.mrp - p.price) / p.mrp) * 100);
-        const msg = encodeURIComponent(`Hi, I'm interested in:\n${p.name}\nPrice: ₹${p.price}\nSize: ${p.size}\nStock: ${p.qty}`);
-        const div = document.createElement("div");
-        div.className = "product-card";
-        div.innerHTML = `
-          <img src="${p.img}" onclick="showPreview('${p.img}')">
-          <h4>${p.name}</h4>
-          <div class="price">
-            <span class="mrp">₹${p.mrp}</span> → <strong>₹${p.price}</strong><br>
-            <span class="discount">${discount}% OFF</span>
-          </div>
-          <div class="size">Size: ${p.size}</div>
-          <div class="stock">Stock: ${p.qty}</div>
-          <a class="whatsapp-btn" href="https://wa.me/917090798777?text=${msg}" target="_blank">📲 Enquire</a>
+      products.forEach(prod => {
+        if (prod.qty === 0) return;
+        const discount = Math.round(((prod.mrp - prod.price) / prod.mrp) * 100);
+        const whatsappMsg = encodeURIComponent(
+          `Hi, I'm interested in this product:\n${prod.name}\nPrice: ₹${prod.price}\nMRP: ₹${prod.mrp}\nSize: ${prod.size}\nStock: ${prod.qty}`
+        );
+
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <img src="${prod.img}" alt="product">
+          <h4>${prod.name}</h4>
+          <div class="price"><span class="mrp">₹${prod.mrp}</span> → <b>₹${prod.price}</b></div>
+          <div class="discount">${discount}% OFF</div>
+          <div class="stock">Stock: ${prod.qty}</div>
+          <div class="size">Size: ${prod.size}</div>
+          <a class="whatsapp-btn" target="_blank" href="https://wa.me/917090798777?text=${whatsappMsg}">📲 Enquire</a>
         `;
-        list.appendChild(div);
+        container.appendChild(card);
       });
     }
 
