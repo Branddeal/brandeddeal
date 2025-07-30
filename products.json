@@ -6,5 +6,13 @@
     "price": 199,
     "qty": 10,
     "size": "S - 3 M -3 L -3 XL -1 "
+  },
+  {
+    "name": "HRX",
+    "img": "https://i.postimg.cc/zvnR2b5W/89a73c93-eb7d-447b-b5e5-4fc84d58ab621594285939430-HERENOWMen-Blue-Regular-Fit-Mid-Rise-Clean-Look-Stretchabl.jpg",
+    "mrp": 2499,
+    "price": 199,
+    "qty": 10,
+    "size": "S - 5 M - 5"
   }
 ]
