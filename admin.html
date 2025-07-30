@@ -1,1 +1,130 @@
-...
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel - BrandedDeal</title>
+  <style>
+    body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+    h2 { text-align: center; }
+    form {
+      background: #fff;
+      padding: 20px;
+      max-width: 400px;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .danger { background: #dc3545; }
+  </style>
+</head>
+<body>
+  <h2>🛠️ BrandedDeal Admin Panel</h2>
+  <form onsubmit="saveProduct(event)">
+    <input type="text" id="name" placeholder="Product Name" required />
+    <input type="url" id="img" placeholder="Image URL (e.g. https://...)" required />
+    <input type="number" id="mrp" placeholder="MRP" required />
+    <input type="number" id="price" placeholder="Selling Price" required />
+    <input type="number" id="qty" placeholder="Stock Quantity" required />
+    <input type="text" id="size" placeholder="Size (e.g. S,M,L or 30,32,34)" required />
+    <input type="password" id="token" placeholder="GitHub Token" required />
+    <button type="submit">➕ Add Product</button>
+    <button type="button" class="danger" onclick="clearAll()">🗑️ Clear All Products</button>
+  </form>
+
+  <script>
+    const owner = "Branddeal";
+    const repo = "brandeddeal";
+    const filePath = "products.json";
+
+    async function fetchProducts(token) {
+      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return await res.json();
+    }
+
+    async function saveProduct(e) {
+      e.preventDefault();
+      const name = nameEl.value;
+      const img = imgEl.value;
+      const mrp = +mrpEl.value;
+      const price = +priceEl.value;
+      const qty = +qtyEl.value;
+      const size = sizeEl.value;
+      const token = tokenEl.value;
+
+      const product = { name, img, mrp, price, qty, size };
+      const data = await fetchProducts(token);
+
+      const decoded = atob(data.content);
+      const json = JSON.parse(decoded);
+      json.push(product);
+
+      const updatedContent = btoa(JSON.stringify(json, null, 2));
+
+      await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Add product via admin.html",
+          content: updatedContent,
+          sha: data.sha
+        })
+      });
+
+      alert("✅ Product list updated!");
+      e.target.reset();
+    }
+
+    async function clearAll() {
+      if (!confirm("Are you sure to clear all products?")) return;
+      const token = prompt("Enter GitHub token again:");
+      if (!token) return;
+
+      const data = await fetchProducts(token);
+      const updatedContent = btoa(JSON.stringify([], null, 2));
+
+      await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Clear all products",
+          content: updatedContent,
+          sha: data.sha
+        })
+      });
+
+      alert("🧹 Product list cleared!");
+    }
+
+    const nameEl = document.getElementById("name");
+    const imgEl = document.getElementById("img");
+    const mrpEl = document.getElementById("mrp");
+    const priceEl = document.getElementById("price");
+    const qtyEl = document.getElementById("qty");
+    const sizeEl = document.getElementById("size");
+    const tokenEl = document.getElementById("token");
+  </script>
+</body>
+</html>
