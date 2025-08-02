@@ -1,10 +1,23 @@
 [
   {
-    "name": "Adidas Men Running Sneakers Duramo Sl2 M JL2644",
-    "img": "https://i.postimg.cc/JzckStXs/11447-DURAMO-SL2-MHALSIL-LUCBLU-GRETWO-5.jpg,https://i.postimg.cc/wBnsnr2B/11447-DURAMO-SL2-MHALSIL-LUCBLU-GRETWO-3.jpg",
-    "mrp": 6999,
-    "price": 3599,
-    "qty": 7,
-    "size": "UK 8 - 2 UK 9 -2 UK 10 - 2 UK 11 -1"
+    "name": "Men's Black Shirt",
+    "mrp": "₹799",
+    "discounted_price": "₹499",
+    "images": [
+      "images/shirt1_1.jpg",
+      "images/shirt1_2.jpg",
+      "images/shirt1_3.jpg"
+    ]
+  },
+  {
+    "name": "Polo T-shirt",
+    "mrp": "₹999",
+    "discounted_price": "₹699",
+    "images": [
+      "images/polo1_1.jpg",
+      "images/polo1_2.jpg",
+      "images/polo1_3.jpg",
+      "images/polo1_4.jpg"
+    ]
   }
 ]
