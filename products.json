@@ -1,31 +1,25 @@
 [
   {
-    "name": "Men's Black Shirt",
-    "mrp": "₹799",
-    "discounted_price": "₹499",
+    "name": "Premium T-Shirt",
     "images": [
-      "images/shirt1_1.jpg",
-      "images/shirt1_2.jpg",
-      "images/shirt1_3.jpg"
-    ]
+      "https://example.com/tshirt-front.jpg",
+      "https://example.com/tshirt-back.jpg",
+      "https://example.com/tshirt-side.jpg"
+    ],
+    "mrp": 999,
+    "price": 499,
+    "qty": 10,
+    "size": "M, L, XL"
   },
   {
-    "name": "Polo T-shirt",
-    "mrp": "₹999",
-    "discounted_price": "₹699",
+    "name": "Classic Jeans",
     "images": [
-      "images/polo1_1.jpg",
-      "images/polo1_2.jpg",
-      "images/polo1_3.jpg",
-      "images/polo1_4.jpg"
-    ]
-  },
-  {
-    "name": "Adidas Men Running Sneakers Duramo Sl2 M JL2644",
-    "img": "https://postimg.cc/dZV1L0ht",
-    "mrp": 6999,
-    "price": 123,
-    "qty": 1,
-    "size": "1"
+      "https://example.com/jeans-front.jpg",
+      "https://example.com/jeans-back.jpg"
+    ],
+    "mrp": 1499,
+    "price": 899,
+    "qty": 5,
+    "size": "30, 32, 34, 36"
   }
 ]
