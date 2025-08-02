@@ -6,7 +6,7 @@
   <style>
     body { font-family: Arial; background: #f5f5f5; padding: 20px; }
     h2 { text-align: center; }
-    form {
+    form, .product-list {
       background: white;
       max-width: 600px;
       margin: 20px auto;
@@ -14,7 +14,7 @@
       border-radius: 8px;
       box-shadow: 0 0 10px #ccc;
     }
-    input, select, button {
+    input, button {
       width: 100%;
       padding: 8px;
       margin: 6px 0;
@@ -23,67 +23,41 @@
     }
     button { background: #28a745; color: white; font-weight: bold; cursor: pointer; }
     .danger { background: #dc3545; }
+    .product {
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+    .product input { width: 48%; margin: 2px 1%; display: inline-block; }
+    .product button { margin-top: 6px; }
   </style>
 </head>
 <body>
-  <h2>📦 BrandedDeal Admin Panel - Smart Size + Multiple Images</h2>
+  <h2>📦 BrandedDeal Admin Panel - Add & Edit Products</h2>
 
   <form onsubmit="addProduct(event)">
-    <input id="name" placeholder="Product Name" required oninput="updateSizeOptions()" />
+    <input id="name" placeholder="Product Name" required />
     <input id="images" placeholder="Image URLs (comma separated)" required />
-    <small>Example: https://img1.jpg, https://img2.jpg</small>
     <input id="mrp" placeholder="MRP" type="number" required />
     <input id="price" placeholder="Selling Price" type="number" required />
     <input id="qty" placeholder="Stock Quantity" type="number" required />
-    <select id="size" required>
-      <option value="">Select size (auto)</option>
-    </select>
+    <input id="size" placeholder="Sizes (e.g. S,M,L or 30,32,...)" required />
     <input id="token" placeholder="GitHub Token" required type="password" />
     <button type="submit">➕ Add Product</button>
     <button type="button" class="danger" onclick="clearAll()">🗑️ Clear All</button>
   </form>
 
+  <div class="product-list" id="productList">
+    <h3>📝 Edit Products</h3>
+    <div id="products"></div>
+  </div>
+
   <script>
     const owner = "Branddeal";
     const repo = "brandeddeal";
     const filePath = "products.json";
+
     let githubToken = "";
-
-    function updateSizeOptions() {
-      const name = document.getElementById("name").value.toLowerCase();
-      const sizeSelect = document.getElementById("size");
-      sizeSelect.innerHTML = '<option value="">Select size</option>';
-
-      let sizes = [];
-
-      if (name.includes("tshirt") || name.includes("shirt") || name.includes("kurti")) {
-        sizes = ["S", "M", "L", "XL", "XXL"];
-      } else if (name.includes("jeans") || name.includes("pant") || name.includes("short")) {
-        sizes = ["26", "28", "30", "32", "34", "36", "38", "40", "42", "44", "46"];
-      } else if (name.includes("men") && name.includes("shoe")) {
-        sizes = ["UK 6", "UK 7", "UK 8", "UK 9", "UK 10", "UK 11", "UK 12"];
-      } else if (name.includes("women") && (name.includes("shoe") || name.includes("footwear"))) {
-        sizes = ["UK 3", "UK 4", "UK 5", "UK 6", "UK 7", "UK 8"];
-      } else if (name.includes("earphone") || name.includes("mobile") || name.includes("charger")) {
-        sizes = [];
-      } else {
-        sizes = ["S", "M", "L", "XL", "XXL"];
-      }
-
-      if (sizes.length > 0) {
-        sizes.forEach(s => {
-          const opt = document.createElement("option");
-          opt.value = s;
-          opt.textContent = s;
-          sizeSelect.appendChild(opt);
-        });
-      } else {
-        const opt = document.createElement("option");
-        opt.value = "N/A";
-        opt.textContent = "No size";
-        sizeSelect.appendChild(opt);
-      }
-    }
 
     async function fetchData() {
       const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
@@ -92,26 +66,26 @@
       return await res.json();
     }
 
-    async function addProduct(e) {
-      e.preventDefault();
-      githubToken = document.getElementById("token").value;
-
-      const name = document.getElementById("name").value;
-      const imageField = document.getElementById("images").value;
-      const images = imageField.split(',').map(url => url.trim());
-      const mrp = parseFloat(document.getElementById("mrp").value);
-      const price = parseFloat(document.getElementById("price").value);
-      const qty = parseInt(document.getElementById("qty").value);
-      const size = document.getElementById("size").value;
-
-      const product = { name, images, mrp, price, qty, size };
-
+    async function loadProducts() {
       const data = await fetchData();
       const json = JSON.parse(atob(data.content));
-      json.push(product);
-      await updateOnGitHub(json, "Added new product: " + name);
-      alert("✅ Product added!");
-      e.target.reset();
+      const container = document.getElementById("products");
+      container.innerHTML = "";
+      json.forEach((prod, i) => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <input value="${prod.name}" id="name_${i}" />
+          <input value="${(prod.images || []).join(',')}" id="images_${i}" />
+          <input value="${prod.mrp}" id="mrp_${i}" type="number" />
+          <input value="${prod.price}" id="price_${i}" type="number" />
+          <input value="${prod.qty}" id="qty_${i}" type="number" />
+          <input value="${prod.size}" id="size_${i}" />
+          <button onclick="updateProduct(${i})">💾 Update</button>
+          <button class="danger" onclick="deleteProduct(${i})">❌ Delete</button>
+        `;
+        container.appendChild(div);
+      });
     }
 
     async function updateOnGitHub(updatedList, msg) {
@@ -130,12 +104,64 @@
       });
     }
 
+    async function updateProduct(index) {
+      const data = await fetchData();
+      const json = JSON.parse(atob(data.content));
+      json[index] = {
+        name: document.getElementById("name_" + index).value,
+        images: document.getElementById("images_" + index).value.split(',').map(i => i.trim()),
+        mrp: +document.getElementById("mrp_" + index).value,
+        price: +document.getElementById("price_" + index).value,
+        qty: +document.getElementById("qty_" + index).value,
+        size: document.getElementById("size_" + index).value
+      };
+      await updateOnGitHub(json, "Updated product: " + json[index].name);
+      alert("✅ Product updated!");
+      loadProducts();
+    }
+
+    async function deleteProduct(index) {
+      if (!confirm("Delete this product?")) return;
+      const data = await fetchData();
+      const json = JSON.parse(atob(data.content));
+      json.splice(index, 1);
+      await updateOnGitHub(json, "Deleted a product");
+      alert("❌ Product deleted.");
+      loadProducts();
+    }
+
     async function clearAll() {
       if (!confirm("Clear all products?")) return;
       const data = await fetchData();
       await updateOnGitHub([], "Cleared all products");
       alert("🧹 All products cleared.");
+      loadProducts();
     }
+
+    async function addProduct(e) {
+      e.preventDefault();
+      githubToken = document.getElementById("token").value;
+      const product = {
+        name: document.getElementById("name").value,
+        images: document.getElementById("images").value.split(',').map(i => i.trim()),
+        mrp: +document.getElementById("mrp").value,
+        price: +document.getElementById("price").value,
+        qty: +document.getElementById("qty").value,
+        size: document.getElementById("size").value
+      };
+      const data = await fetchData();
+      const json = JSON.parse(atob(data.content));
+      json.push(product);
+      await updateOnGitHub(json, "Added new product: " + product.name);
+      alert("✅ Product added!");
+      e.target.reset();
+      loadProducts();
+    }
+
+    document.getElementById("token").addEventListener("change", () => {
+      githubToken = document.getElementById("token").value;
+      loadProducts();
+    });
   </script>
 </body>
 </html>
