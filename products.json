@@ -46,5 +46,16 @@
     "price": 3500,
     "qty": 7,
     "size": "UK 7"
+  },
+  {
+    "name": "adidas BRA",
+    "images": [
+      "https://i.postimg.cc/prwc0vcJ/61-CGd-ZR0-BHL-AC-SX679.jpg",
+      "https://i.postimg.cc/KYcb77Mv/51ku-HOdt-Vq-L-AC-SX679.jpg"
+    ],
+    "mrp": 1299,
+    "price": 299,
+    "qty": 2,
+    "size": "S - 3 M -3 L -3 XL -1 "
   }
 ]
