@@ -1,180 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>BrandedDeal Admin Panel</title>
+  <meta charset="UTF-8">
+  <title>BrandedDeal - Products</title>
   <style>
-    body { font-family: Arial; background: #f5f5f5; padding: 20px; }
-    h2 { text-align: center; }
-    form, .product-list {
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+    h2 { text-align: center; color: #333; }
+    .products { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 30px; }
+    .product-card {
       background: white;
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #ccc;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 15px;
+      width: 260px;
+      text-align: center;
     }
-    input, button {
+    .main-img {
       width: 100%;
-      padding: 8px;
-      margin: 6px 0;
-      border-radius: 5px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .thumbs {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .thumbs img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
       border: 1px solid #ccc;
     }
-    button { background: #28a745; color: white; font-weight: bold; cursor: pointer; }
-    .danger { background: #dc3545; }
-    .product {
-      border-top: 1px solid #eee;
-      padding-top: 10px;
+    .price { font-size: 16px; margin-top: 10px; }
+    .mrp { text-decoration: line-through; color: #888; }
+    .discount { color: green; font-weight: bold; }
+    .stock, .size { font-size: 14px; margin-top: 4px; }
+    .whatsapp-btn {
       margin-top: 10px;
+      display: inline-block;
+      background: #25D366;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
     }
-    .product input { width: 48%; margin: 2px 1%; display: inline-block; }
-    .product button { margin-top: 6px; }
+    #previewModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    #previewModal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #fff;
+    }
   </style>
 </head>
 <body>
-  <h2>📦 BrandedDeal Admin Panel</h2>
+  <h2>🛍️ Welcome to BrandedDeal</h2>
+  <div class="products" id="productList">Loading products...</div>
 
-  <form onsubmit="addProduct(event)">
-    <input id="name" placeholder="Product Name" required />
-    <input id="images" placeholder="Image URLs (comma separated)" required />
-    <input id="mrp" placeholder="MRP" type="number" required />
-    <input id="price" placeholder="Selling Price" type="number" required />
-    <input id="qty" placeholder="Stock Quantity" type="number" required />
-    <input id="size" placeholder="Sizes (e.g. S,M,L or 30,32,...)" required />
-    <input id="token" placeholder="GitHub Token" required type="password" />
-    <button type="submit">➕ Add Product</button>
-    <button type="button" class="danger" onclick="clearAll()">🗑️ Clear All</button>
-  </form>
-
-  <div class="product-list" id="productList">
-    <h3>📝 Edit Products</h3>
-    <div id="products"></div>
+  <div id="previewModal" onclick="this.style.display='none'">
+    <img id="previewImage" src="" alt="Preview">
   </div>
 
   <script>
-    const owner = "Branddeal";
+    const username = "Branddeal";
     const repo = "brandeddeal";
-    const filePath = "products.json";
+    const file = "products.json";
 
-    let githubToken = "";
-
-    async function fetchData() {
-      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
-        headers: { Authorization: "Bearer " + githubToken }
-      });
-      return await res.json();
+    function showPreview(src) {
+      document.getElementById("previewImage").src = src;
+      document.getElementById("previewModal").style.display = "flex";
     }
 
     async function loadProducts() {
-      const data = await fetchData();
-      const json = JSON.parse(atob(data.content));
-      const container = document.getElementById("products");
+      const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${file}`);
+      const data = await res.json();
+      const products = JSON.parse(atob(data.content));
+
+      const container = document.getElementById("productList");
       container.innerHTML = "";
-      json.forEach((prod, i) => {
+
+      products.forEach(prod => {
+        if (prod.qty === 0) return;
+
+        const discount = Math.round(((prod.mrp - prod.price) / prod.mrp) * 100);
+        const imageList = Array.isArray(prod.images) ? prod.images : [prod.img];
+        const firstImage = imageList[0];
+
         const div = document.createElement("div");
-        div.className = "product";
+        div.className = "product-card";
+
+        const whatsappMsg = encodeURIComponent(`Hi, I'm interested in this product:\n${prod.name}\nPrice: ₹${prod.price}\nMRP: ₹${prod.mrp}\nSize: ${prod.size}`);
+
+        const mainImgId = `img_${prod.name.replaceAll(' ', '_')}`;
+        const thumbsHtml = imageList.map(img => `
+          <img src="${img}" onclick="
+            document.getElementById('${mainImgId}').src='${img}';
+            document.getElementById('${mainImgId}').setAttribute('data-full', '${img}');
+          ">
+        `).join("");
+
         div.innerHTML = `
-          <input value="${prod.name}" id="name_${i}" />
-          <input value="${(prod.images || []).join(',')}" id="images_${i}" />
-          <input value="${prod.mrp}" id="mrp_${i}" type="number" />
-          <input value="${prod.price}" id="price_${i}" type="number" />
-          <input value="${prod.qty}" id="qty_${i}" type="number" />
-          <input value="${prod.size}" id="size_${i}" />
-          <button onclick="updateProduct(${i})">💾 Update</button>
-          <button class="danger" onclick="deleteProduct(${i})">❌ Delete</button>
+          <img id="${mainImgId}" class="main-img" src="${firstImage}" alt="${prod.name}" data-full="${firstImage}" onclick="showPreview(this.getAttribute('data-full'))">
+          <div class="thumbs">${thumbsHtml}</div>
+          <h4>${prod.name}</h4>
+          <p class="price">
+            <span class="mrp">₹${prod.mrp}</span> → <strong>₹${prod.price}</strong><br>
+            <span class="discount">${discount}% OFF</span>
+          </p>
+          <div class="stock">Stock: ${prod.qty}</div>
+          <div class="size">Size: ${prod.size}</div>
+          <a class="whatsapp-btn" href="https://wa.me/917090798777?text=${whatsappMsg}" target="_blank">📲 Enquire</a>
         `;
         container.appendChild(div);
       });
+
+      if (products.length === 0) {
+        container.innerHTML = "No products available.";
+      }
     }
 
-    async function updateOnGitHub(updatedList, msg) {
-      const data = await fetchData();
-      await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
-        method: "PUT",
-        headers: {
-          Authorization: "Bearer " + githubToken,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: msg,
-          content: btoa(JSON.stringify(updatedList, null, 2)),
-          sha: data.sha
-        })
-      });
-    }
-
-    async function updateProduct(index) {
-      const data = await fetchData();
-      const json = JSON.parse(atob(data.content));
-      json[index] = {
-        name: document.getElementById("name_" + index).value,
-        images: document.getElementById("images_" + index).value.split(',').map(i => i.trim()),
-        mrp: +document.getElementById("mrp_" + index).value,
-        price: +document.getElementById("price_" + index).value,
-        qty: +document.getElementById("qty_" + index).value,
-        size: document.getElementById("size_" + index).value
-      };
-      await updateOnGitHub(json, "Updated product: " + json[index].name);
-      alert("✅ Product updated!");
-      loadProducts();
-    }
-
-    async function deleteProduct(index) {
-      if (!confirm("Delete this product?")) return;
-      const data = await fetchData();
-      const json = JSON.parse(atob(data.content));
-      json.splice(index, 1);
-      await updateOnGitHub(json, "Deleted a product");
-      alert("❌ Product deleted.");
-      loadProducts();
-    }
-
-    async function clearAll() {
-      if (!confirm("Clear all products?")) return;
-      const data = await fetchData();
-      await updateOnGitHub([], "Cleared all products");
-      alert("🧹 All products cleared.");
-      loadProducts();
-    }
-
-    async function addProduct(e) {
-      e.preventDefault();
-      githubToken = document.getElementById("token").value;
-      const product = {
-        name: document.getElementById("name").value,
-        images: document.getElementById("images").value.split(',').map(i => i.trim()),
-        mrp: +document.getElementById("mrp").value,
-        price: +document.getElementById("price").value,
-        qty: +document.getElementById("qty").value,
-        size: document.getElementById("size").value
-      };
-      const data = await fetchData();
-      const json = JSON.parse(atob(data.content));
-      json.push(product);
-      await updateOnGitHub(json, "Added new product: " + product.name);
-      alert("✅ Product added!");
-      e.target.reset();
-      loadProducts();
-    }
-
-    function setupTokenListener() {
-  const tokenInput = document.getElementById("token");
-  tokenInput.addEventListener("change", () => {
-    githubToken = tokenInput.value.trim();
-    if (githubToken) loadProducts();
-  });
-
-  // Auto-load if token already filled (e.g. after refresh)
-  if (tokenInput.value.trim()) {
-    githubToken = tokenInput.value.trim();
     loadProducts();
-  }
-}
-
-window.onload = setupTokenListener;
-
-
   </script>
 </body>
 </html>
