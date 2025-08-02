@@ -25,5 +25,15 @@
     "price": 3500,
     "qty": 7,
     "size": "S"
+  },
+  {
+    "name": "HRX",
+    "images": [
+      "https://postimg.cc/RNp1K43N"
+    ],
+    "mrp": 222,
+    "price": 222,
+    "qty": 1,
+    "size": "S"
   }
 ]
