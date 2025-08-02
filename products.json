@@ -1,16 +1,5 @@
 [
   {
-    "name": "Classic Jeans",
-    "images": [
-      "https://example.com/jeans-front.jpg",
-      "https://example.com/jeans-back.jpg"
-    ],
-    "mrp": 1499,
-    "price": 899,
-    "qty": 5,
-    "size": "30, 32, 34, 36"
-  },
-  {
     "name": "Adidas Men Running Sneakers Duramo Sl2 M JL2644",
     "img": "https://i.postimg.cc/wBnsnr2B/11447-DURAMO-SL2-MHALSIL-LUCBLU-GRETWO-3.jpg,https://i.postimg.cc/JzckStXs/11447-DURAMO-SL2-MHALSIL-LUCBLU-GRETWO-5.jpg",
     "mrp": 12,
