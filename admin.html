@@ -158,10 +158,14 @@
       loadProducts();
     }
 
-    document.getElementById("token").addEventListener("change", () => {
-      githubToken = document.getElementById("token").value;
-      loadProducts();
-    });
+    window.onload = () => {
+  const tokenInput = document.getElementById("token");
+  tokenInput.addEventListener("change", () => {
+    githubToken = tokenInput.value;
+    loadProducts();
+  });
+};
+
   </script>
 </body>
 </html>
