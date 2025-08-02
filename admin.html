@@ -101,13 +101,10 @@
         const discount = Math.round(((prod.mrp - prod.price) / prod.mrp) * 100);
         const imageList = Array.isArray(prod.images) ? prod.images : [prod.img];
         const firstImage = imageList[0];
-
-        const div = document.createElement("div");
-        div.className = "product-card";
+        const mainImgId = `img_${prod.name.replaceAll(' ', '_')}`;
 
         const whatsappMsg = encodeURIComponent(`Hi, I'm interested in this product:\n${prod.name}\nPrice: ₹${prod.price}\nMRP: ₹${prod.mrp}\nSize: ${prod.size}`);
 
-        const mainImgId = `img_${prod.name.replaceAll(' ', '_')}`;
         const thumbsHtml = imageList.map(img => `
           <img src="${img}" onclick="
             document.getElementById('${mainImgId}').src='${img}';
@@ -115,6 +112,8 @@
           ">
         `).join("");
 
+        const div = document.createElement("div");
+        div.className = "product-card";
         div.innerHTML = `
           <img id="${mainImgId}" class="main-img" src="${firstImage}" alt="${prod.name}" data-full="${firstImage}" onclick="showPreview(this.getAttribute('data-full'))">
           <div class="thumbs">${thumbsHtml}</div>
