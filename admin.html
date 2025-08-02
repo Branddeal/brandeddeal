@@ -158,13 +158,22 @@
       loadProducts();
     }
 
-    window.onload = () => {
+    function setupTokenListener() {
   const tokenInput = document.getElementById("token");
   tokenInput.addEventListener("change", () => {
-    githubToken = tokenInput.value;
-    loadProducts();
+    githubToken = tokenInput.value.trim();
+    if (githubToken) loadProducts();
   });
-};
+
+  // Auto-load if token already filled (e.g. after refresh)
+  if (tokenInput.value.trim()) {
+    githubToken = tokenInput.value.trim();
+    loadProducts();
+  }
+}
+
+window.onload = setupTokenListener;
+
 
   </script>
 </body>
