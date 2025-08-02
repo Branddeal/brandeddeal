@@ -28,5 +28,16 @@
     "price": 299,
     "qty": 2,
     "size": "S - 3 M -3 L -3 XL -1 "
+  },
+  {
+    "name": "Adidas Men Running Sneakers Duramo Sl2 M JL2644",
+    "images": [
+      "https://i.postimg.cc/wBnsnr2B/11447-DURAMO-SL2-MHALSIL-LUCBLU-GRETWO-3.jpg",
+      "https://i.postimg.cc/JzckStXs/11447-DURAMO-SL2-MHALSIL-LUCBLU-GRETWO-5.jpg"
+    ],
+    "mrp": 1,
+    "price": 1,
+    "qty": 1,
+    "size": "1"
   }
 ]
