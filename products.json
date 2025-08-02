@@ -1,17 +1,5 @@
 [
   {
-    "name": "Premium T-Shirt",
-    "images": [
-      "https://example.com/tshirt-front.jpg",
-      "https://example.com/tshirt-back.jpg",
-      "https://example.com/tshirt-side.jpg"
-    ],
-    "mrp": 999,
-    "price": 499,
-    "qty": 10,
-    "size": "M, L, XL"
-  },
-  {
     "name": "Classic Jeans",
     "images": [
       "https://example.com/jeans-front.jpg",
