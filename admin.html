@@ -26,11 +26,12 @@
   </style>
 </head>
 <body>
-  <h2>📦 BrandedDeal Admin Panel - Smart Size</h2>
+  <h2>📦 BrandedDeal Admin Panel - Smart Size + Multiple Images</h2>
 
   <form onsubmit="addProduct(event)">
     <input id="name" placeholder="Product Name" required oninput="updateSizeOptions()" />
     <input id="images" placeholder="Image URLs (comma separated)" required />
+    <small>Example: https://img1.jpg, https://img2.jpg</small>
     <input id="mrp" placeholder="MRP" type="number" required />
     <input id="price" placeholder="Selling Price" type="number" required />
     <input id="qty" placeholder="Stock Quantity" type="number" required />
@@ -96,7 +97,8 @@
       githubToken = document.getElementById("token").value;
 
       const name = document.getElementById("name").value;
-      const images = document.getElementById("images").value.split(',').map(url => url.trim());
+      const imageField = document.getElementById("images").value;
+      const images = imageField.split(',').map(url => url.trim());
       const mrp = parseFloat(document.getElementById("mrp").value);
       const price = parseFloat(document.getElementById("price").value);
       const qty = parseInt(document.getElementById("qty").value);
