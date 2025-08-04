@@ -42,5 +42,16 @@
     "price": 11,
     "qty": 111,
     "size": "S - 5 M - 5"
+  },
+  {
+    "name": "Ajay Singh",
+    "images": [
+      "https://i.postimg.cc/wBnsnr2B/11447-DURAMO-SL2-MHALSIL-LUCBLU-GRETWO-3.jpg",
+      "https://i.postimg.cc/JzckStXs/11447-DURAMO-SL2-MHALSIL-LUCBLU-GRETWO-5.jpg"
+    ],
+    "mrp": 111,
+    "price": 11,
+    "qty": 1,
+    "size": "1"
   }
 ]
