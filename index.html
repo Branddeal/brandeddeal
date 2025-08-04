@@ -4,9 +4,69 @@
   <meta charset="UTF-8">
   <title>BrandedDeal - Products</title>
   <style>
-    /* same styles as before */
-    body { font-family: Arial; background: #f4f4f4; margin: 0; padding: 20px; }
-    /* ...other style stays exactly the same... */
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+    h2 { text-align: center; color: #333; }
+    .products { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 30px; }
+    .product-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 15px;
+      width: 260px;
+      text-align: center;
+    }
+    .main-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .thumbs {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .thumbs img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+    }
+    .price { font-size: 16px; margin-top: 10px; }
+    .mrp { text-decoration: line-through; color: #888; }
+    .discount { color: green; font-weight: bold; }
+    .stock, .size { font-size: 14px; margin-top: 4px; }
+    .whatsapp-btn {
+      margin-top: 10px;
+      display: inline-block;
+      background: #25D366;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    #previewModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    #previewModal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #fff;
+    }
   </style>
 </head>
 <body>
@@ -14,7 +74,7 @@
   <div class="products" id="productList">Loading products...</div>
 
   <div id="previewModal" onclick="this.style.display='none'">
-    <img id="previewImage" src="" alt="Preview" />
+    <img id="previewImage" src="" alt="Preview">
   </div>
 
   <script>
@@ -31,35 +91,47 @@
       const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${file}`);
       const data = await res.json();
       const products = JSON.parse(atob(data.content));
+
       const container = document.getElementById("productList");
       container.innerHTML = "";
 
       products.forEach(prod => {
         if (prod.qty === 0) return;
+
+        const discount = Math.round(((prod.mrp - prod.price) / prod.mrp) * 100);
         const imageList = Array.isArray(prod.images) ? prod.images : [prod.img];
         const firstImage = imageList[0];
-        const mainImgId = `img_${prod.name.replaceAll(" ", "_")}`;
+        const mainImgId = `img_${prod.name.replaceAll(' ', '_')}`;
 
-        const thumbsHtml = imageList.map(img =>
-          `<img src="${img}" onclick="
+        const whatsappMsg = encodeURIComponent(`Hi, I'm interested in this product:\n${prod.name}\nPrice: ₹${prod.price}\nMRP: ₹${prod.mrp}\nSize: ${prod.size}`);
+
+        const thumbsHtml = imageList.map(img => `
+          <img src="${img}" onclick="
             document.getElementById('${mainImgId}').src='${img}';
             document.getElementById('${mainImgId}').setAttribute('data-full', '${img}');
-          ">`
-        ).join("");
+          ">
+        `).join("");
 
-        container.innerHTML += `
-          <div class="product-card">
-            <img id="${mainImgId}" class="main-img" src="${firstImage}"
-                 data-full="${firstImage}"
-                 onclick="showPreview(this.getAttribute('data-full'))" />
-            <div class="thumbs">${thumbsHtml}</div>
-            <h4>${prod.name}</h4>
-            <div class="stock">Stock: ${prod.qty}</div>
-            <div class="size">Size: ${prod.size}</div>
-            <!-- other product info -->
-          </div>
+        const div = document.createElement("div");
+        div.className = "product-card";
+        div.innerHTML = `
+          <img id="${mainImgId}" class="main-img" src="${firstImage}" alt="${prod.name}" data-full="${firstImage}" onclick="showPreview(this.getAttribute('data-full'))">
+          <div class="thumbs">${thumbsHtml}</div>
+          <h4>${prod.name}</h4>
+          <p class="price">
+            <span class="mrp">₹${prod.mrp}</span> → <strong>₹${prod.price}</strong><br>
+            <span class="discount">${discount}% OFF</span>
+          </p>
+          <div class="stock">Stock: ${prod.qty}</div>
+          <div class="size">Size: ${prod.size}</div>
+          <a class="whatsapp-btn" href="https://wa.me/917090798777?text=${whatsappMsg}" target="_blank">📲 Enquire</a>
         `;
+        container.appendChild(div);
       });
+
+      if (products.length === 0) {
+        container.innerHTML = "No products available.";
+      }
     }
 
     loadProducts();
