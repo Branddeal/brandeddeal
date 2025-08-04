@@ -20,5 +20,16 @@
     "price": 3500,
     "qty": 7,
     "size": "UK 8 - 2 UK 9 -2 UK 10 - 2 UK 11 -1"
+  },
+  {
+    "name": "ADIDAS SWIMWEAR",
+    "images": [
+      "https://i.postimg.cc/prwc0vcJ/61-CGd-ZR0-BHL-AC-SX679.jpg",
+      "https://i.postimg.cc/KYcb77Mv/51ku-HOdt-Vq-L-AC-SX679.jpg"
+    ],
+    "mrp": 2999,
+    "price": 999,
+    "qty": 10,
+    "size": "S - 3 M -3 L -3 XL -1 "
   }
 ]
