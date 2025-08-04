@@ -31,5 +31,16 @@
     "price": 999,
     "qty": 10,
     "size": "S - 3 M -3 L -3 XL -1 "
+  },
+  {
+    "name": "HRX",
+    "images": [
+      "https://i.postimg.cc/prwc0vcJ/61-CGd-ZR0-BHL-AC-SX679.jpg",
+      "https://i.postimg.cc/KYcb77Mv/51ku-HOdt-Vq-L-AC-SX679.jpg"
+    ],
+    "mrp": 11111,
+    "price": 11,
+    "qty": 111,
+    "size": "S - 5 M - 5"
   }
 ]
