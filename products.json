@@ -21,5 +21,17 @@
     "price": 3299,
     "qty": 7,
     "size": "UK 8 - 2 UK 9 -2 UK 10 - 2 UK 11 -1"
+  },
+  {
+    "name": "Adidas ROSEWUD PRO 2.0M",
+    "images": [
+      "https://i.postimg.cc/x15c4TDt/ROSEWUD-PRO-2-0-M-White-JK8328-01-00-standard.jpg",
+      "https://i.postimg.cc/G2W2y4Gh/ROSEWUD-PRO-2-0-M-White-JK8328-04-standard.jpg",
+      "https://i.postimg.cc/T3t3c7gs/ROSEWUD-PRO-2-0-M-White-JK8328-03-standard.jpg"
+    ],
+    "mrp": 6299,
+    "price": 3779,
+    "qty": 5,
+    "size": "UK 8 - 2 UK 9 -2 UK 10 - 1"
   }
 ]
