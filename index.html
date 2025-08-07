@@ -124,95 +124,126 @@
       cursor: pointer;
       border-radius: 6px;
     }
+
+    /* ✅ Add this new CSS for banner styling */
+    .hero-banner {
+      position: relative;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .hero-banner h1 {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      color: black;
+      background: rgba(255,255,255,0.6);
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    .hero-banner p {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      color: #000;
+      background: rgba(255,255,255,0.5);
+      padding: 5px 15px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
- <section class="hero-banner">
+
+<!-- ✅ Banner Section -->
+<section class="hero-banner">
   <img src="banner.png" alt="Rarely Banner" style="width: 100%; max-height: 350px; object-fit: cover;" />
   <h1>Rarely</h1>
   <p>Rare Finds. Real Deals.</p>
 </section>
 
-  <div class="products" id="productList">Loading products...</div>
+<div class="products" id="productList">Loading products...</div>
 
-  <div id="previewModal" onclick="this.style.display='none'">
-    <button class="nav-btn" onclick="event.stopPropagation(); showPrev()">⏮️ Prev</button>
-    <img id="previewImage" src="" alt="Preview">
-    <button class="nav-btn" onclick="event.stopPropagation(); showNext()">⏭️ Next</button>
-  </div>
+<div id="previewModal" onclick="this.style.display='none'">
+  <button class="nav-btn" onclick="event.stopPropagation(); showPrev()">⏮️ Prev</button>
+  <img id="previewImage" src="" alt="Preview">
+  <button class="nav-btn" onclick="event.stopPropagation(); showNext()">⏭️ Next</button>
+</div>
 
-  <script>
-    const username = "Branddeal";
-    const repo = "brandeddeal";
-    const file = "products.json";
+<script>
+  const username = "Branddeal";
+  const repo = "brandeddeal";
+  const file = "products.json";
 
-    let currentImages = [];
-    let currentIndex = 0;
+  let currentImages = [];
+  let currentIndex = 0;
 
-    function showPreviewList(images, index) {
-      currentImages = images;
-      currentIndex = index;
-      document.getElementById("previewImage").src = images[index];
-      document.getElementById("previewModal").style.display = "flex";
+  function showPreviewList(images, index) {
+    currentImages = images;
+    currentIndex = index;
+    document.getElementById("previewImage").src = images[index];
+    document.getElementById("previewModal").style.display = "flex";
+  }
+
+  function showNext() {
+    if (currentImages.length === 0) return;
+    currentIndex = (currentIndex + 1) % currentImages.length;
+    document.getElementById("previewImage").src = currentImages[currentIndex];
+  }
+
+  function showPrev() {
+    if (currentImages.length === 0) return;
+    currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+    document.getElementById("previewImage").src = currentImages[currentIndex];
+  }
+
+  async function loadProducts() {
+    const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${file}`);
+    const data = await res.json();
+    const products = JSON.parse(atob(data.content));
+
+    const container = document.getElementById("productList");
+    container.innerHTML = "";
+
+    products.forEach(prod => {
+      if (prod.qty === 0) return;
+
+      const discount = Math.round(((prod.mrp - prod.price) / prod.mrp) * 100);
+      const imageList = Array.isArray(prod.images) ? prod.images : [prod.img];
+      const firstImage = imageList[0];
+      const mainImgId = `img_${prod.name.replaceAll(' ', '_')}`;
+      const thumbsHtml = imageList.map(img => `
+        <img src="${img}" onclick="document.getElementById('${mainImgId}').src='${img}'">
+      `).join("");
+
+      const whatsappMsg = encodeURIComponent(`Hi, I'm interested in this product:\n${prod.name}\nPrice: ₹${prod.price}\nMRP: ₹${prod.mrp}\nSize: ${prod.size}`);
+
+      const div = document.createElement("div");
+      div.className = "product-card";
+      div.innerHTML = `
+        <img id="${mainImgId}" class="main-img" src="${firstImage}" alt="${prod.name}"
+          onclick='showPreviewList(${JSON.stringify(imageList)}, 0)'>
+        <div class="thumbs">${thumbsHtml}</div>
+        <h4>${prod.name}</h4>
+        <p class="price">
+          <span class="mrp">₹${prod.mrp}</span> → <strong>₹${prod.price}</strong><br>
+          <span class="discount">${discount}% OFF</span>
+        </p>
+        <div class="stock">Stock: ${prod.qty}</div>
+        <div class="size">Size: ${prod.size}</div>
+        <a class="whatsapp-btn" href="https://wa.me/917090798777?text=${whatsappMsg}" target="_blank">📲 Enquire</a>
+      `;
+      container.appendChild(div);
+    });
+
+    if (products.length === 0) {
+      container.innerHTML = "No products available.";
     }
+  }
 
-    function showNext() {
-      if (currentImages.length === 0) return;
-      currentIndex = (currentIndex + 1) % currentImages.length;
-      document.getElementById("previewImage").src = currentImages[currentIndex];
-    }
-
-    function showPrev() {
-      if (currentImages.length === 0) return;
-      currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
-      document.getElementById("previewImage").src = currentImages[currentIndex];
-    }
-
-    async function loadProducts() {
-      const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${file}`);
-      const data = await res.json();
-      const products = JSON.parse(atob(data.content));
-
-      const container = document.getElementById("productList");
-      container.innerHTML = "";
-
-      products.forEach(prod => {
-        if (prod.qty === 0) return;
-
-        const discount = Math.round(((prod.mrp - prod.price) / prod.mrp) * 100);
-        const imageList = Array.isArray(prod.images) ? prod.images : [prod.img];
-        const firstImage = imageList[0];
-        const mainImgId = `img_${prod.name.replaceAll(' ', '_')}`;
-        const thumbsHtml = imageList.map(img => `
-          <img src="${img}" onclick="document.getElementById('${mainImgId}').src='${img}'">
-        `).join("");
-
-        const whatsappMsg = encodeURIComponent(`Hi, I'm interested in this product:\n${prod.name}\nPrice: ₹${prod.price}\nMRP: ₹${prod.mrp}\nSize: ${prod.size}`);
-
-        const div = document.createElement("div");
-        div.className = "product-card";
-        div.innerHTML = `
-          <img id="${mainImgId}" class="main-img" src="${firstImage}" alt="${prod.name}"
-            onclick='showPreviewList(${JSON.stringify(imageList)}, 0)'>
-          <div class="thumbs">${thumbsHtml}</div>
-          <h4>${prod.name}</h4>
-          <p class="price">
-            <span class="mrp">₹${prod.mrp}</span> → <strong>₹${prod.price}</strong><br>
-            <span class="discount">${discount}% OFF</span>
-          </p>
-          <div class="stock">Stock: ${prod.qty}</div>
-          <div class="size">Size: ${prod.size}</div>
-          <a class="whatsapp-btn" href="https://wa.me/917090798777?text=${whatsappMsg}" target="_blank">📲 Enquire</a>
-        `;
-        container.appendChild(div);
-      });
-
-      if (products.length === 0) {
-        container.innerHTML = "No products available.";
-      }
-    }
-
-    loadProducts();
-  </script>
+  loadProducts();
+</script>
 </body>
 </html>
