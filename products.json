@@ -45,5 +45,15 @@
     "price": 7999,
     "qty": 3,
     "size": "UK 7 - 2 UK 9 -1"
+  },
+  {
+    "name": "HRX by Hrithik Roshan Women Surf Solid Rapid-Dry Antimicrobial Running Tights",
+    "images": [
+      "https://i.postimg.cc/6qf02rGG/524606474-1148078934113089-1804944482491570909-n.jpg"
+    ],
+    "mrp": 2599,
+    "price": 299,
+    "qty": 10,
+    "size": "XS - 5 S - 5 M - 5"
   }
 ]
