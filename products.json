@@ -55,5 +55,18 @@
     "price": 299,
     "qty": 10,
     "size": "XS - 5 S - 5 M - 5"
+  },
+  {
+    "name": "Adidas Men Originals Rivalry Low Shoes",
+    "images": [
+      "https://i.postimg.cc/W3m6jsFp/Rivalry-Low-Shoes-Grey-JH9600-01-standard.avif",
+      "https://i.postimg.cc/T29q4YvC/Rivalry-Low-Shoes-Grey-JH9600-04-standard.avif",
+      "https://i.postimg.cc/RZ37h76D/Rivalry-Low-Shoes-Grey-JH9600-02-standard-hover.avif",
+      "https://i.postimg.cc/d0rGmJ9R/Rivalry-Low-Shoes-Grey-JH9600-03-standard.avif"
+    ],
+    "mrp": 11999,
+    "price": 7999,
+    "qty": 11,
+    "size": "UK - 10"
   }
 ]
