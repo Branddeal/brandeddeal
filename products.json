@@ -108,5 +108,18 @@
     "price": 5999,
     "qty": 1,
     "size": "UK 9 - 1"
+  },
+  {
+    "name": "Adidas Rivalry Low Lux Shoes IH0255",
+    "images": [
+      "https://i.postimg.cc/rsd5wFzm/Rivalry-Low-Lux-Shoes-Beige-IH0255-HM5.avif",
+      "https://i.postimg.cc/gkZv9Jft/Rivalry-Low-Lux-Shoes-Beige-IH0255-HM1.avif",
+      "https://i.postimg.cc/63qvM5r0/Whats-App-Image-2025-08-27-at-1-21-04-PM.jpg",
+      "https://i.postimg.cc/gJ76QF4P/Whats-App-Image-2025-08-27-at-1-21-05-PM.jpg"
+    ],
+    "mrp": 10999,
+    "price": 5500,
+    "qty": 2,
+    "size": "UK 9 - 1 UK 10 -1 "
   }
 ]
